@@ -7,6 +7,7 @@ from jose import jwt
 
 from decouple import config
 SECRET_KEY = config('SECRET_KEY')
+ALGORITHM = config('ALGORITHM')
 
 from pydantic import BaseModel
 from passlib.hash import pbkdf2_sha256 as bcrypt
@@ -42,16 +43,9 @@ async def login(users: User):
             'status': status.HTTP_401_UNAUTHORIZED
         }
 
-    aqui = {"token": data["id"]}
+    token = {"token": data["id"]}
 
-    # expire = datetime.utcnow() + timedelta(minutes=15)
-    # to_encode = ({"exp": expire})
-
-    token = jwt.encode(aqui, SECRET_KEY, 'HS256').encode().decode('utf-8')
-
-    # token = jwt.encode(access_token={'token': '1'}, key=SECRET_KEY, algorithm='HS256')
-
-    print(token)
+    token_encoded = jwt.encode(token, SECRET_KEY, algorithm=ALGORITHM)
 
     hashPassword = bcrypt.verify(users.password, data["password"])
 
@@ -59,7 +53,7 @@ async def login(users: User):
         return {
             'message': 'Success!',
             'status': status.HTTP_200_OK,
-            'token': token
+            'token': token_encoded
         }
 
     if data["password"] != hashPassword:

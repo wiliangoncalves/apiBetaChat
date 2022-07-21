@@ -1,5 +1,6 @@
 import json
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from flask import jsonify
 from ..database.database import database_connect
 from ..database.crud import get_user
 from pydantic import BaseModel
@@ -8,16 +9,20 @@ from jose import jwt
 
 from decouple import config
 SECRET_KEY = config('SECRET_KEY')
+ALGORITHM = config('ALGORITHM')
 
 class Token(BaseModel):
     token: str | None = None
 
 home_router = FastAPI()
 
-@home_router.post("/")
-async def home(token: Token):
+@home_router.get("/")
+async def home(request: Request):
     await database_connect()
-    decoded_token = jwt.decode(token.token, SECRET_KEY, algorithms=['HS256'])
+
+    token = request.headers.get('Authorization').split(" ")[-1]
+
+    decoded_token = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
 
     query = "SELECT * FROM users WHERE id = :tk"
 
@@ -25,10 +30,9 @@ async def home(token: Token):
 
     data = await get_user(query, values)
 
-    print(data['email'])
-
     return {
         'message': 'Chegou',
         'name': data['name'],
-        'email': data['email']
+        'email': data['email'],
+        'avatar': data['avatar']
     }
