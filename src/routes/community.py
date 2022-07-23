@@ -19,17 +19,26 @@ async def create_community(request: Request):
 
     decoded_token = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
 
+    values = {"tk": decoded_token["token"]}
+
     query = "select * from community_users inner join users on users_id = :tk join communitys on communitys_id = communitys.id"
 
-    values = {"tk": decoded_token["token"]}
 
     data = await get_community(query, values)
 
-    print('COMMUNITY', data)
+    if data == None:
+        return {
+            'message': 'None community was found!',
+            'status': status.HTTP_404_NOT_FOUND
+        }
 
-    return {
-        'message': 'Chegou no community'
-    }
+    else:
+        return {
+            'message': 'Community found!',
+            'status': status.HTTP_200_OK,
+            'name': data['name'],
+            'avatar': data['avatar']
+        }
 
     # query = "SELECT * FROM communitys WHERE id = :id"
 
