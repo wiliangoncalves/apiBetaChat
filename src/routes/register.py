@@ -87,6 +87,8 @@ async def set_register(users: User):
     ]
     await set_user(query, values)
 
+
+    database_disconnect()
     return {
         'message': 'Success!',
         'status': status.HTTP_200_OK

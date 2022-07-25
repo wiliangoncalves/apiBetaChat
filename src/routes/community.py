@@ -57,4 +57,4 @@ async def create_community(request: Request):
     #     return {
     #         'message': 'Name already exists!',
     #         'status': status.HTTP_406_NOT_ACCEPTABLE,
-    #     }
+        # }

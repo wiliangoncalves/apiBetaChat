@@ -50,11 +50,13 @@ async def login(users: User):
     hashPassword = bcrypt.verify(users.password, data["password"])
 
     if hashPassword and data != None:
+        database_disconnect()
         return {
             'message': 'Success!',
             'status': status.HTTP_200_OK,
             'token': token_encoded
         }
+    
 
     if data["password"] != hashPassword:
         return {

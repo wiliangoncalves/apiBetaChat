@@ -30,10 +30,15 @@ async def get_community(query, values):
     await database_connect()
 
     data = await database.fetch_all(query=query, values=values)
+    
+    # for rec in data:
+    #     name = tuple(rec.values())[-4]
+    #     description = tuple(rec.values())[-2]
+    #     it = tuple(rec.values())
 
     if len(data) == 0:
         return None
-    
+
     for items in data:
         item = dict(items)
 
